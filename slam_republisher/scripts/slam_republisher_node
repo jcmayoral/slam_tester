@@ -3,5 +3,4 @@ from slam_republisher.Republisher import Republisher
 
 if __name__ == '__main__':
     main = Republisher()
-    main.run()
-
+    main.run(10)
