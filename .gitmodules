@@ -7,3 +7,6 @@
 [submodule "rtabmap_ros"]
 	path = rtabmap_ros
 	url = https://github.com/introlab/rtabmap_ros.git
+[submodule "rtabmap"]
+	path = rtabmap
+	url = https://github.com/introlab/rtabmap.git
