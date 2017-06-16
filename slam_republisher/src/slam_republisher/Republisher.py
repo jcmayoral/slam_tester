@@ -7,17 +7,15 @@ class Republisher:
 
     def __init__(self):
         rospy.init_node('slam_republisher', anonymous=True)
-        rospy.Subscriber("~/base/twist_mux/command_teleop_keyboard",Twist, self.getTwistCB)
         rospy.Subscriber("~/cam3d/depth_registered/points",PointCloud2, self.publishPoints)
         rospy.Subscriber("~/base/odometry_controller/odometry",Odometry, self.publishOdom)
-        rospy.Subscriber("~/amcl_pose",PoseWithCovarianceStamped, self.getPoseCB)
         self.imu_Publisher = rospy.Publisher("/imu", Imu)
         self.odom_Publisher = rospy.Publisher("/odom", Odometry)
         self.points_Publisher = rospy.Publisher("/points2", PointCloud2)
         self.freq = 10
         self.count = 0
-        self.is_Pose_received = True
-        self.is_Twist_received = True
+        self.is_Pose_received = False
+        self.is_Twist_received = False
         self.orientation = Quaternion()
         self.orientation.w = 1
         self.twist = Twist()
@@ -27,19 +25,16 @@ class Republisher:
     def publishOdom(self,msg):
         msg.child_frame_id = "base_link"
         msg.header.frame_id = "base_link"
-        self.odom_Publisher.publish(msg)
+        self.odom_Publisher.publish(    msg)
+        self.orientation = msg.pose.pose.orientation
+        self.is_Pose_received = True
+        self.twist = msg.twist.twist
+        self.is_Twist_received = True
 
     def publishPoints(self,msg):
         #msg.header.frame_id = "base_link"
         self.points_Publisher.publish(msg)
 
-    def getPoseCB(self,msg):
-        self.orientation = msg.pose.pose.orientation
-        self.is_Pose_received = True
-
-    def getTwistCB(self,msg):
-        self.twist = msg
-        self.is_Twist_received = True
 
     def publishImuMsg(self):
         #This code do not consider covariance
@@ -48,7 +43,7 @@ class Republisher:
             return
         tmp = Imu()
         tmp.header.seq = self.count
-        tmp.header.frame_id = "cam3d_link"
+        tmp.header.frame_id = "base_link"
         tmp.orientation = self.orientation
 
         tmp.linear_acceleration.x = self.twist.linear.x/self.freq
