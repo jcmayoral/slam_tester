@@ -25,7 +25,7 @@ class Republisher:
     def publishOdom(self,msg):
         msg.child_frame_id = "base_link"
         msg.header.frame_id = "base_link"
-        self.odom_Publisher.publish(    msg)
+        self.odom_Publisher.publish(msg)
         self.orientation = msg.pose.pose.orientation
         self.is_Pose_received = True
         self.twist = msg.twist.twist
