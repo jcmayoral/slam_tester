@@ -28,7 +28,7 @@ class Republisher:
         self.twist = msg.twist.twist
 
     def publishPoints(self,msg):
-        #msg.header.frame_id = "base_link"
+        msg.header.frame_id = "base_link"
         self.points_Publisher.publish(msg)
 
 
