@@ -9,13 +9,12 @@ class Republisher:
         rospy.init_node('slam_republisher', anonymous=True)
         rospy.Subscriber("~/cam3d/depth_registered/points",PointCloud2, self.publishPoints)
         rospy.Subscriber("~/base/odometry_controller/odometry",Odometry, self.publishOdom)
-        self.imu_Publisher = rospy.Publisher("/imu", Imu)
-        self.odom_Publisher = rospy.Publisher("/odom", Odometry)
-        self.points_Publisher = rospy.Publisher("/points2", PointCloud2)
+        self.imu_Publisher = rospy.Publisher("/imu", Imu, queue_size = 1)
+        self.odom_Publisher = rospy.Publisher("/odom", Odometry, queue_size = 1)
+        self.points_Publisher = rospy.Publisher("/points2", PointCloud2, queue_size = 1)
         self.freq = 200
         self.count = 0
         self.orientation = Quaternion()
-        self.orientation.w = 1
         self.twist = Twist()
         self.is_shutdown = False
         print "Republisher Node Initialized"
@@ -39,8 +38,8 @@ class Republisher:
         tmp.header.frame_id = "base_link"
         tmp.orientation = self.orientation
 
-        tmp.linear_acceleration.x = self.twist.linear.x/self.freq
-        tmp.linear_acceleration.y = self.twist.linear.y/self.freq
+        tmp.linear_acceleration.x = self.twist.linear.x
+        tmp.linear_acceleration.y = self.twist.linear.y
         tmp.angular_velocity.z = self.twist.angular.z
         self.imu_Publisher.publish(tmp)
         self.count = self.count + 1
